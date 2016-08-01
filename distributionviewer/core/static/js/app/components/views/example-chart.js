@@ -40,8 +40,8 @@ export class ExampleChart extends React.Component {
 
       // General display
       title: 'Number of available TV channels',
-      width: this.props.width,
-      height: this.props.height,
+      full_width: true,
+      full_height: true,
       area: false,
 
       // x-axis
@@ -56,10 +56,10 @@ export class ExampleChart extends React.Component {
   }
 
   render() {
-    var chart = <div ref={ref => this.target = ref}></div>;
+    var chart = <div className="chart" ref={ref => this.target = ref}></div>;
 
     if (this.props.link) {
-      return <Link to="/chart/1/">{chart}</Link>;
+      return <Link className="chart-link" to="/chart/1/">{chart}</Link>;
     } else {
       return chart;
     }
