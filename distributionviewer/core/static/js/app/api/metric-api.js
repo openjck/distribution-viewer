@@ -5,13 +5,18 @@ import {
   gettingMetric, getMetricSuccess, getMetricFailure
 } from '../actions/metric-actions';
 
+const prodEndpoints = {
+  GET_METRICS: `${location.origin}/metrics/`,
+  GET_METRIC: `${location.origin}/distributions/`
+}
+
 const mockEndpoints = {
   GET_METRICS: 'http://localhost:3009/metrics',
   GET_METRIC: 'http://localhost:3009/'
 };
 
-// TODO: Check node environment to set this.
-export const endpoints = mockEndpoints;
+export const endpoints = process.env.NODE_ENV === 'production' ? prodEndpoints : mockEndpoints;
+console.dir(endpoints);
 
 // Fetch list of metrics.
 export function getMetrics() {
@@ -30,7 +35,9 @@ export function getMetrics() {
 export function getMetric(name) {
   store.dispatch(gettingMetric());
 
-  return axios.get(endpoints.GET_METRIC + name).then(response => {
+  console.log(`${endpoints.GET_METRIC}${name}/`);
+
+  return axios.get(`${endpoints.GET_METRIC}${name}/`).then(response => {
     store.dispatch(getMetricSuccess(response.data));
     return response;
   }).catch(response => {
