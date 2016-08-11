@@ -1,0 +1,51 @@
+@import 'lib';
+
+$filter-proportion = 1;
+$content-proportion = 4;
+
+/* Layout */
+.filtered-charts {
+  display: flex;
+}
+
+.filters {
+  flex: $filter-proportion 0;
+  margin-top: -($header-height);
+  padding-top: $header-height;
+}
+
+.filters + * {
+  flex: $content-proportion 0;
+  margin-left: $default-whitespace;
+}
+
+.filtered header {
+  position: relative;
+  left: ($filter-proportion / ($filter-proportion + $content-proportion)) * 100 + '%';
+  margin-left: $default-whitespace;
+}
+
+/* Other styles */
+.filters {
+  background-color: $green;
+
+  ul {
+    list-style: none;
+    margin: 0;
+  }
+
+  li {
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: $normal-text;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+  }
+}

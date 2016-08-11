@@ -1,0 +1,45 @@
+@import 'lib';
+
+body {
+  color: $normal-text;
+  font-family: helvetica, sans-serif;
+  margin: 0;
+}
+
+.global-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0 auto;
+  max-width: 1400px;
+}
+
+header {
+  height: $header-height;
+}
+
+header, main {
+  flex: 1 100%;
+}
+
+h1 {
+  margin: 5px 0;
+}
+
+.primary-header-link {
+  font-size: 20px;
+  font-weight: 200;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.date-range {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+a {
+  color: $mild-blue;
+}
