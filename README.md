@@ -42,7 +42,8 @@ Follow these steps to install distribution-viewer locally:
 2. `source env/bin/activate`
 3. `./manage.py runserver`
 4. In another terminal: `gulp watch`
-4. Load [127.0.0.1:8000](http://127.0.0.1:8000)
+5. In a third terminal: `gulp serve:api`
+6. Load [127.0.0.1:8000](http://127.0.0.1:8000)
 
 New dependencies will need to be installed from time to time. Run the following
 if you see an error about a missing or out-of-date dependency:
