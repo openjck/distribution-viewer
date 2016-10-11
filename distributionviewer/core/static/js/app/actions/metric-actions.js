@@ -20,36 +20,16 @@ export function getMetricsMetadataFailure(status) {
   };
 }
 
-export function gettingMetrics() {
-  return {
-    type: types.GETTING_METRICS
-  };
-}
-
-export function getMetricsSuccess(metrics) {
-  return {
-    type: types.GET_METRICS_SUCCESS,
-    metrics
-  };
-}
-
-export function getMetricsFailure(status) {
-  return {
-    type: types.GET_METRICS_FAILURE,
-    status
-  };
-}
-
 export function gettingMetric() {
   return {
     type: types.GETTING_METRIC
   };
 }
 
-export function getMetricSuccess(metric) {
+export function getMetricSuccess(metrics) {
   return {
     type: types.GET_METRIC_SUCCESS,
-    metric
+    metrics
   };
 }
 

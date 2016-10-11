@@ -17,7 +17,7 @@ export default class extends React.Component {
   render() {
     // Only show the "Show outliers" toggle when it would have an effect
     let outliersToggle = '';
-    if (this.props.type === 'numeric' && this.props.points.length >= 100) {
+    if (this.props.metricType === 'numeric' && this.props.numMetricPoints >= 100) {
       outliersToggle = <label className="show-outliers"><input type="checkbox" defaultChecked={this.state.showOutliers} onChange={this.handleChange} />Show outliers</label>
     }
 

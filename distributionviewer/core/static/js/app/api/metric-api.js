@@ -14,6 +14,9 @@ const mockEndpoints = {
 
 export const endpoints = process.env.NODE_ENV === 'production' ? prodEndpoints : mockEndpoints;
 
+const metrics = {};
+
+// jck TODO: Not sure what to do with this yet
 // Get metric IDs from query params
 export function getQueryMetrics(query) {
   var qmetrics = [];
@@ -23,48 +26,34 @@ export function getQueryMetrics(query) {
   return qmetrics;
 }
 
-// Get an array of all metrics
-export function getMetrics(query) {
+export function getMetricsMetadata() {
   store.dispatch(metricActions.gettingMetricsMetadata());
 
   return axios.get(endpoints.GET_METRICS).then(response => {
-    var qmetrics = getQueryMetrics(query);
-    var metricsMetadata = response.data.metrics;
-
-    if (qmetrics.length) {
-      metricsMetadata = metricsMetadata.filter(
-        metric => qmetrics.indexOf(metric.id) > -1);
-    }
+    const metricsMetadata = response.data.metrics;
     store.dispatch(metricActions.getMetricsMetadataSuccess(metricsMetadata));
-
-    store.dispatch(metricActions.gettingMetrics());
-    axios.all(metricsMetadata.map(metricData => getMetric(metricData.id)))
-      .then(axios.spread(function(...metricData) {
-        store.dispatch(metricActions.getMetricsSuccess(metricData));
-      })).catch(error => {
-        console.error(error);
-        store.dispatch(metricActions.getMetricsFailure(error.response.status));
-        return error;
-      });
-
-    return response;
+    return metricsMetadata;
   }).catch(error => {
     console.error(error);
-    store.dispatch(metricActions.getMetricsMetadataFailure(error.response.status));
+    store.dispatch(metricActions.getMetricsMetadataFailure(error.status));
     return error;
   });
 }
 
-// Get a single metric
-export function getMetric(chartId) {
-  store.dispatch(metricActions.gettingMetric());
+export function getMetric(metricId) {
+  if (metricId in metrics) {
+    return metrics[metricId];
+  } else {
+    store.dispatch(metricActions.gettingMetric());
 
-  return axios.get(`${endpoints.GET_METRIC}${chartId}/`).then(response => {
-    store.dispatch(metricActions.getMetricSuccess(response.data));
-    return response.data;
-  }).catch(error => {
-    console.error(error);
-    store.dispatch(metricActions.getMetricFailure(error.response.status));
-    return error;
-  });
+    return axios.get(`${endpoints.GET_METRIC}${metricId}/`).then(response => {
+      metrics[metricId] = response.data;
+      store.dispatch(metricActions.getMetricSuccess(metrics));
+      return response.data;
+    }).catch(error => {
+      console.error(error);
+      store.dispatch(metricActions.getMetricFailure(error.status));
+      return error;
+    });
+  }
 }

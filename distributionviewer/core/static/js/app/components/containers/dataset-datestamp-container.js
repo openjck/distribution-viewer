@@ -24,9 +24,14 @@ export class DatasetDatestampContainer extends React.Component {
 }
 
 const mapStateToProps = function(store) {
+  // jck TODO
+  // return {
+  //   metric: store.metricsState.metrics[2],
+  // };
+
   return {
-    metric: store.metricState.metric
-  };
+    metric: { dataSet: '2016-01-01' },
+  }
 };
 
 export default connect(mapStateToProps)(DatasetDatestampContainer);

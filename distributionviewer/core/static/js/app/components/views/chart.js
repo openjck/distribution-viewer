@@ -19,18 +19,17 @@ export default class extends React.Component {
   }
 
   componentDidMount() {
-    // On the chart detail page, points are loaded after the component mounts
-    if (this.props.points) {
+    if (!this.props.isFetching) {
       this.loadChart();
     }
   }
 
-  componentWillUpdate(nextProps) {
-    // Load the chart if it can be loaded and hasn't been already. Otherwise,
-    // it just needs to be updated.
-    if (!this.chartLoaded && nextProps.points) {
-      this.loadChart(nextProps);
-    } else if (this.chartLoaded) {
+  componentDidUpdate() {
+    if (this.props.isFetching) return;
+
+    if (!this.chartLoaded) {
+      this.loadChart();
+    } else {
       this.insertOrUpdateChart();
     }
   }
@@ -65,10 +64,10 @@ export default class extends React.Component {
     }
   }
 
-  loadChart(props = this.props) {
-    this.pointsMeta = this.buildPointsMeta(props.points);
+  loadChart() {
+    this.pointsMeta = this.buildPointsMeta(this.props.points);
     this.insertOrUpdateChart();
-    document.querySelector(`.chart-${props.id}`).classList.remove('is-fetching');
+    document.querySelector(`.chart-${this.props.id}`).classList.remove('is-fetching');
     this.chartLoaded = true;
   }
 
@@ -114,7 +113,7 @@ export default class extends React.Component {
       show_rollover_text: false,
 
       // General display
-      title: this.props.metric,
+      title: this.props.name,
       full_width: true,
       area: false,
       missing_is_hidden: true,
