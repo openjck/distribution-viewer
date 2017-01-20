@@ -39,10 +39,18 @@ export default function(props) {
               size={props.size.innerWidth}
             />
             <ChartLineContainer
+              population="example"
               metricId={props.metricId}
               xScale={props.xScale}
               yScale={props.yScale}
               data={props.data}
+            />
+            <ChartLineContainer
+              population="example2"
+              metricId={props.metricId}
+              xScale={props.xScale}
+              yScale={props.yScale}
+              data={props.data.map(d => Object.assign({}, d, { y: d.y + .100 }))}
             />
             <ChartFocus />
             <ChartHoverContainer

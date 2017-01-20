@@ -10,12 +10,14 @@ import ChartConfigContainer from './components/containers/chart-config-container
 import ChartDetailContainer from './components/containers/chart-detail-container';
 import NotFound from './components/views/not-found';
 import PermissionDenied from './components/views/permission-denied';
+import PopulationContainer from './components/containers/population-container';
 
 export default (
   <Router history={browserHistory}>
     <Route component={MainLayout}>
       <Route path="/" component={Home} />
       <Route path="/chart/:metricId" component={ChartDetailContainer} />
+      <Route path="/population/:population" component={PopulationContainer} />
       <Route path="/configure" component={ChartConfigContainer} />
       <Route path="/permission-denied" component={PermissionDenied} />
       <Route path="*" component={NotFound} />

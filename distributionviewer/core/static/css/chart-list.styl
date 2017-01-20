@@ -3,10 +3,16 @@
 $y-axis-width = 10px;
 
 .chart-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  width: 100%;
+  .title {
+    text-align: center;
+  }
+
+  .charts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+  }
 
   .chart {
     height: $chart-preview-height;
