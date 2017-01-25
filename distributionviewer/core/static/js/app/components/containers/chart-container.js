@@ -28,7 +28,7 @@ class ChartContainer extends React.Component {
   }
 
   componentDidMount() {
-    metricApi.getMetric(this.props.metricId);
+    metricApi.getMetric(this.props.metricId, this.props.whitelistedPopulations);
 
     if (this.props.isDetail) {
       this.chartDetail = document.getElementById('chart-detail');

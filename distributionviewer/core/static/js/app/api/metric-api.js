@@ -49,9 +49,15 @@ export function getMetricMetadata(metricIds) {
   });
 }
 
-// Get a single metric
-export function getMetric(metricId) {
-  return axios.get(`${endpoints.GET_METRIC}${metricId}/`).then(response => {
+/**
+ * Get a single metric
+ *
+ * @param metricId
+ * @param {Array} Populations that should be fetched. For example:
+ *                ["os:release", "os:nightly"]
+ */
+export function getMetric(metricId, populations=['All']) {
+  return axios.get(`${endpoints.GET_METRIC}${metricId}/?pop=${populations.join(',')}`).then(response => {
     store.dispatch(metricActions.getMetricSuccess(metricId, response.data));
     return response.data;
   }).catch(error => {

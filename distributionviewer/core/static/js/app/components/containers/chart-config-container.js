@@ -9,8 +9,6 @@ import * as metricApi from '../../api/metric-api';
 class ChartConfigContainer extends React.Component {
   constructor(props) {
     super(props);
-    this.whitelistedMetricIds = metricApi.getWhitelistedMetricIds(props.location);
-    this.whitelistedPopulations = metricApi.getWhitelistedPopulations(props.location);
     this.populationList = Array(
       {key: 'channel:release', name: 'Release update channel'},
       {key: 'channel:beta', name: 'Beta update channel'},
@@ -54,8 +52,6 @@ class ChartConfigContainer extends React.Component {
   render() {
     return (
       <ChartConfig {...this.props}
-        whitelistedMetricIds={this.whitelistedMetricIds}
-        whitelistedPopulations={this.whitelistedPopulations}
         populationList={this.populationList}
         handleSubmit={this._handleSubmit} />
     );

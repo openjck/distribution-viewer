@@ -5,6 +5,7 @@ import { Router, Route, browserHistory } from 'react-router';
 import MainLayout from './components/layouts/main-layout';
 
 // Pages
+import AppContainer from './components/containers/app-container';
 import Home from './components/home';
 import ChartConfigContainer from './components/containers/chart-config-container';
 import ChartDetailContainer from './components/containers/chart-detail-container';
@@ -13,12 +14,14 @@ import PermissionDenied from './components/views/permission-denied';
 
 export default (
   <Router history={browserHistory}>
-    <Route component={MainLayout}>
-      <Route path="/" component={Home} />
-      <Route path="/chart/:metricId" component={ChartDetailContainer} />
-      <Route path="/configure" component={ChartConfigContainer} />
-      <Route path="/permission-denied" component={PermissionDenied} />
-      <Route path="*" component={NotFound} />
+    <Route component={AppContainer}>
+      <Route component={MainLayout}>
+        <Route path="/" component={Home} />
+        <Route path="/chart/:metricId" component={ChartDetailContainer} />
+        <Route path="/configure" component={ChartConfigContainer} />
+        <Route path="/permission-denied" component={PermissionDenied} />
+        <Route path="*" component={NotFound} />
+      </Route>
     </Route>
   </Router>
 );
