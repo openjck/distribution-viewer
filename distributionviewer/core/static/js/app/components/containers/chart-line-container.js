@@ -6,14 +6,17 @@ import ChartLine from '../views/chart-line';
 
 
 export default class extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
   _drawLine() {
-    let props = this.props;
     let line = d3Shape.line()
-                .x(d => props.xScale(d.x))
-                .y(d => props.yScale(d.y))
+                .x(d => this.props.xScale(d.x))
+                .y(d => this.props.yScale(d.y))
                 .curve(d3Shape.curveStepAfter);
 
-    d3Selection.select(`.chart-${props.metricId} .line`).datum(props.data).attr('d', line);
+    d3Selection.select(`.chart-${this.props.metricId} .population-${this.props.popOrdinal} .line`).datum(this.props.data).attr('d', line);
   }
 
   componentDidMount() {

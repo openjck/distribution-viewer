@@ -7,6 +7,31 @@ import ChartHoverContainer from '../containers/chart-hover-container';
 import ChartFocus from './chart-focus';
 
 
+/**
+ * Move the "All" population to be the last element of the array.
+ *
+ * In SVG, the element with the greatest "z-index" is the element that appears
+ * last in the markup. We want the "All" population line to appear above all
+ * other population lines when they overlap, so we need the "All" population to
+ * be the last element in the array.
+ */
+function makeAllPopulationLast(populations) {
+  let all = [];
+
+  const reorderedPopulations = populations.filter(currentPopulation => {
+    if (currentPopulation.population === 'All') {
+      all = currentPopulation;
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  reorderedPopulations.push(all);
+
+  return reorderedPopulations;
+}
+
 export default function(props) {
   if (props.isFetching) {
     return (
@@ -38,22 +63,34 @@ export default function(props) {
               refLabels={props.refLabels}
               size={props.size.innerWidth}
             />
-            <ChartLineContainer
-              metricId={props.metricId}
-              xScale={props.xScale}
-              yScale={props.yScale}
-              data={props.data}
-            />
-            <ChartFocus />
+            {makeAllPopulationLast(props.populations).map((population, index) => {
+              let popOrdinal = index + 1;
+              return (
+                <g key={index} className={`population population-${popOrdinal}`}>
+                  <ChartLineContainer
+                    metricId={props.metricId}
+                    popOrdinal={popOrdinal}
+                    className="chart-line"
+
+                    xScale={props.xScale}
+                    yScale={props.yScale}
+                    data={population.points}
+                  />
+                  <ChartFocus />
+                </g>
+              );
+            })}
             <ChartHoverContainer
               metricId={props.metricId}
+
               size={props.size}
-              xScale={props.xScale}
-              yScale={props.yScale}
               hoverString={props.hoverString}
               refLabels={props.refLabels}
               metricType={props.metricType}
-              data={props.data}
+
+              xScale={props.xScale}
+              yScale={props.yScale}
+              populations={props.populations}
             />
           </g>
         </svg>

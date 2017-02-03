@@ -2,14 +2,13 @@ import React from 'react';
 import * as d3Array from 'd3-array';
 import * as d3Format from 'd3-format';
 
-import { select, mouse } from 'd3-selection';
+import { select, selectAll, mouse } from 'd3-selection';
 import format from 'string-template';
 
 
 export default class extends React.Component {
   componentDidMount() {
     let hoverElm = select(this.refs.rect);
-    this.focusElm = select(`.chart-${this.props.metricId} .focus`);
     this.bisector = d3Array.bisector(d => d.x).left;
 
     // Terrible hack to bind an event in a way d3 prefers.
@@ -19,27 +18,38 @@ export default class extends React.Component {
     });
   }
   _handleMouseMove() {
-    let props = this.props;
+    const props = this.props;
+
     let x0 = props.xScale.invert(mouse(this.refs.rect)[0]);
-    let i = this.bisector(props.data, x0, 1);
-    let d0 = props.data[i - 1];
 
-    // Ternary to fix comparison with array index out of bounds.
-    let d1 = props.data[i] ? props.data[i] : props.data[i - 1];
+    for (let populationIndex = 0; populationIndex < props.populations.length; populationIndex++) {
+      const currentData = props.populations[populationIndex].points;
 
-    // 'd' holds the currently hovered data object.
-    let d = x0 - d0.x > d1.x - x0 ? d1 : d0;
+      let i = this.bisector(currentData, x0, 1);
+      let d0 = currentData[i - 1];
 
-    // For category charts we have to grab the proportion manually.
-    let proportion = props.metricType === 'category' ? props.data[d.x - 1].p : d.p;
+      this.focusElm = selectAll(`.chart-${props.metricId} .population-${populationIndex + 1} .focus`);
 
-    // Position the focus circle on chart line.
-    this.focusElm.attr('transform', `translate(${props.xScale(d.x)}, ${props.yScale(d.y)})`);
+      // Ternary to fix comparison with array index out of bounds.
+      const d1 = currentData[i] ? currentData[i] : currentData[i - 1];
 
+      // 'd' holds the currently hovered data object.
+      let d = x0 - d0.x > d1.x - x0 ? d1 : d0;
+
+      // For category charts we have to grab the proportion manually.
+      let proportion = props.metricType === 'category' ? currentData[d.x - 1].p : d.p;
+
+      // Position the focus circle on chart line.
+      this.focusElm.attr('transform', `translate(${props.xScale(d.x)}, ${props.yScale(d.y)})`);
+    }
+
+    // TODO: Temporary: Only show this when there is only one population
     // Set formatted chart hover text.
-    select('.secondary-menu-content .chart-info').text(
-      this._getHoverString(props.metricType, d.x, d.y, proportion)
-    );
+    if (props.populations.length === 1) {
+      select('.secondary-menu-content .chart-info').text(
+        this._getHoverString(props.metricType, d.x, d.y, proportion)
+      );
+    }
   }
   _getFormattedVal(val) {
     return d3Format.format('.1%')(val).replace('%', '');

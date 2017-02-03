@@ -53,8 +53,9 @@ export function getMetricMetadata(metricIds) {
  * Get a single metric
  *
  * @param metricId
- * @param {Array} Populations that should be fetched. For example:
- *                ["os:release", "os:nightly"]
+ * @param {Array} populations - Populations that should be fetched. For example:
+ *                              ["os:release", "os:nightly"]
+ *                              Defaults to ['All']
  */
 export function getMetric(metricId, populations=['All']) {
   return axios.get(`${endpoints.GET_METRIC}${metricId}/?pop=${populations.join(',')}`).then(response => {

@@ -28,7 +28,10 @@ class ChartContainer extends React.Component {
   }
 
   componentDidMount() {
-    metricApi.getMetric(this.props.metricId, this.props.whitelistedPopulations);
+    // Always show the "All" population
+    const populationsToShow = this.props.whitelistedPopulations ? this.props.whitelistedPopulations.concat(['All']) : ['All'];
+
+    metricApi.getMetric(this.props.metricId, populationsToShow);
 
     if (this.props.isDetail) {
       this.chartDetail = document.getElementById('chart-detail');
@@ -69,22 +72,32 @@ class ChartContainer extends React.Component {
   _initialize(props) {
     const outlierThreshold = 100;
 
-    this.allData = this._getFormattedData(props.metric.populations[0].points);
+    this.allData = this._getFormattedData(props.metric.populations);
 
-    if (props.metric.type === 'numeric' && this.allData.length > outlierThreshold) {
+    // The number of data points that the biggest population has. For example,
+    // if one population has 5 data points, another has 35, and another has 10,
+    // this will be equal to 35.
+    const biggestPopulationLength = Math.max(...this.allData.map(p => p.points.length));
+
+    if (props.metric.type === 'numeric' && biggestPopulationLength > outlierThreshold) {
       this.dataExcludingOutliers = this._removeOutliers(this.allData);
       this.activeData = props.showOutliers ? this.allData : this.dataExcludingOutliers;
     } else {
       this.activeData = this.allData;
     }
 
-    this.refLabels = [];
-    this.activeData.map(item => {
-      this.refLabels[item.x] = item.label;
-    });
+    for (let i = 0; i < this.activeData.length; i++) {
+      let currentPoints = this.activeData[i].points;
 
+      this.refLabels = [];
+      currentPoints.map(item => {
+        this.refLabels[item.x] = item.label;
+      });
+    }
+
+    this.allActivePoints = this.activeData.map(p => p.points).reduce((previous, current) => previous.concat(current), []);
     this.yScale = d3Scale.scaleLinear()
-                    .domain([0, d3Array.max(this.activeData, d => d.y)])
+                    .domain([0, d3Array.max(this.allActivePoints, d => d.y)])
                     .range([this.state.size.innerHeight, 0])
                     .nice(); // Y axis should extend to nicely readable 0..100
 
@@ -97,31 +110,55 @@ class ChartContainer extends React.Component {
   }
 
   // Map metric points to new keys to be used by d3.
-  _getFormattedData(dataPoints) {
-    var formattedPoints = [];
+  _getFormattedData(populations) {
+    let formattedPopulations = [];
 
-    for (let i = 0; i < dataPoints.length; i++) {
-      formattedPoints.push({
-        x: dataPoints[i]['refRank'] || parseFloat(dataPoints[i]['b']),
-        y: dataPoints[i]['c'],
-        p: dataPoints[i]['p'],
-        label: dataPoints[i]['b']
-      });
+    // Inteate over populations...
+    for (let i = 0; i < populations.length; i++) {
+      let formattedPoints = [];
+      let currentPopulation = populations[i];
+      let currentPoints = currentPopulation.points;
+
+      // Iterate over data points within this population...
+      for (let j = 0; j < currentPoints.length; j++) {
+        formattedPoints.push({
+          x: currentPoints[j]['refRank'] || parseFloat(currentPoints[j]['b']),
+          y: currentPoints[j]['c'],
+          p: currentPoints[j]['p'],
+          label: currentPoints[j]['b']
+        });
+      }
+
+      formattedPopulations[i] = currentPopulation;
+      formattedPopulations[i].points = formattedPoints;
     }
 
-    return formattedPoints;
+    return formattedPopulations;
   }
 
-  // Return an array with only the central 99% of elements included. Assumes
-  // allData is sorted.
-  _removeOutliers(allData) {
-    // The indices of the first and last element to be included in the result
-    const indexFirst = Math.round(allData.length * 0.005) - 1;
-    const indexLast = Math.round(allData.length * 0.995) - 1;
+  /**
+   * Return an array of population data with only the central 99% of data points
+   * included for each population. Assumes points are already sorted.
+   *
+   * @param {Array} populations - The populations object returned by the API
+   */
+  _removeOutliers(populations) {
+    let populationsWithoutOutliers = [];
 
-    // Add 1 to indexLast because the second paramater to Array.slice is not
-    // inclusive
-    return allData.slice(indexFirst, indexLast + 1);
+    for (let i = 0; i < populations.length; i++) {
+      let currentPoints = populations[i].points;
+
+      // The indices of the first and last element to be included in the result
+      const indexFirst = Math.round(currentPoints.length * 0.005) - 1;
+      const indexLast = Math.round(currentPoints.length * 0.995) - 1;
+
+      // Add 1 to indexLast because the second paramater to Array.slice is not
+      // inclusive
+      populationsWithoutOutliers[i] = populations[i];
+      populationsWithoutOutliers[i].points = currentPoints.slice(indexFirst, indexLast + 1);
+    }
+
+    return populationsWithoutOutliers;
   }
 
   _getXScale(props, innerWidth) {
@@ -129,7 +166,7 @@ class ChartContainer extends React.Component {
     let xScale;
     if (props.metric.type === 'category') {
       xScale = d3Scale.scaleLinear()
-                 .domain([1, d3Array.max(this.activeData, d => d.x)])
+                 .domain([1, d3Array.max(this.allActivePoints, d => d.x)])
                  .range([0, innerWidth]);
     } else {
       let scaleType;
@@ -147,7 +184,7 @@ class ChartContainer extends React.Component {
       }
 
       xScale = scaleType
-                 .domain(d3Array.extent(this.activeData, d => d.x))
+                 .domain(d3Array.extent(this.allActivePoints, d => d.x))
                  .range([0, innerWidth]);
     }
 
@@ -180,7 +217,7 @@ class ChartContainer extends React.Component {
 
           metricId={this.props.metricId}
           name={this.props.metric.metric}
-          data={this.activeData}
+          populations={this.activeData}
           refLabels={this.refLabels}
           metricType={this.props.metric.type}
           showOutliers={this.props.showOutliers}
