@@ -8,11 +8,18 @@
     stroke-width: 2px;
   }
 }
+
 .line {
   fill: none;
-  stroke: $mild-blue;
   stroke-width: 1.5px;
 }
+
+for $i in (1..8) {
+  .population-{$i} .line {
+    stroke: lookup('$pop-' + $i + '-color')
+  }
+}
+
 .tick {
   text {
     fill: $chart-gray;
@@ -23,6 +30,7 @@
     opacity: 0.2;
   }
 }
+
 .focus {
   display: none;
 
@@ -32,6 +40,7 @@
     stroke-width: 2px;
   }
 }
+
 .hover-zone {
   fill: none;
   pointer-events: all;

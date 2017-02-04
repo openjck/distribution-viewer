@@ -71,7 +71,11 @@ class ChartContainer extends React.Component {
     for (let i = 0; i < props.metric.populations.length; i++) {
       const population = props.metric.populations[i];
       const fmtData = this._getFormattedData(population.points);
-      const fmtDataExcludingOutliers = this._removeOutliers(fmtData);
+
+      let fmtDataExcludingOutliers;
+      if (this.shouldShowOutliers === false) {
+        fmtDataExcludingOutliers = this._removeOutliers(fmtData);
+      }
 
       // If this population has the most data points so far, it's the biggest
       // population. We'll need to know which population is biggest when we set
@@ -81,10 +85,11 @@ class ChartContainer extends React.Component {
       }
 
       // population.population = the name of this population
-      this.populationData[population.population] = {
-        all: fmtData,
-        excludingOutliers: fmtDataExcludingOutliers,
-      };
+      this.populationData[population.population] = {};
+      this.populationData[population.population]['all'] = fmtData;
+      if (fmtDataExcludingOutliers) {
+        this.populationData[population.population]['excludingOutliers'] = fmtDataExcludingOutliers;
+      }
     }
 
     // Make a copy of the biggest dataset we can show right now. That is, the
