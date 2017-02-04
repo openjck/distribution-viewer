@@ -49,13 +49,9 @@ class ChartContainer extends React.Component {
     const selectedScaleChanged = this.props.selectedScale !== prevProps.selectedScale;
 
     // If the outliers setting changed, update the active data accordingly.
-    // Check against false explicitly because props are sometimes undefined.
+    // Check against true explicitly because props are sometimes undefined.
     if (outliersSettingChanged) {
-      if (showOutliers) {
-        this.activeData = this.allData;
-      } else if (showOutliers === false) {
-        this.activeData = this.dataExcludingOutliers;
-      }
+      this.shouldShowOutliers = props.metric.type === 'numeric' && showOutliers === true;
     }
 
     // If either the outliers setting or the selected scale has changed, the
@@ -68,27 +64,52 @@ class ChartContainer extends React.Component {
 
   _initialize(props) {
     const outlierThreshold = 100;
+    this.shouldShowOutliers = props.metric.type === 'numeric' && props.showOutliers;
 
-    this.allData = this._getFormattedData(props.metric.populations[0].points);
+    this.populationData = {};
+    let biggestPopulation;
+    for (let i = 0; i < props.metric.populations.length; i++) {
+      const population = props.metric.populations[i];
+      const fmtData = this._getFormattedData(population.points);
+      const fmtDataExcludingOutliers = this._removeOutliers(fmtData);
 
-    if (props.metric.type === 'numeric' && this.allData.length > outlierThreshold) {
-      this.dataExcludingOutliers = this._removeOutliers(this.allData);
-      this.activeData = props.showOutliers ? this.allData : this.dataExcludingOutliers;
+      // If this population has the most data points so far, it's the biggest
+      // population. We'll need to know which population is biggest when we set
+      // the scales later.
+      if (!biggestPopulation || population.points.length > biggestPopulation.points.length) {
+        biggestPopulation = population;
+      }
+
+      // population.population = the name of this population
+      this.populationData[population.population] = {
+        all: fmtData,
+        excludingOutliers: fmtDataExcludingOutliers,
+      };
+    }
+
+    // Make a copy of the biggest dataset we can show right now. That is, the
+    // dataset from the biggest population after it is optionally trimmed of
+    // outliers.
+    //
+    // We'll need this when setting the scales.
+    if (this.shouldShowOutliers) {
+      this.biggestDatasetToShow = this.populationData[biggestPopulation.population].all;
     } else {
-      this.activeData = this.allData;
+      this.biggestDatasetToShow = this.populationData[biggestPopulation.population].excludingOutliers;
     }
 
     this.refLabels = [];
-    this.activeData.map(item => {
+    this.biggestDatasetToShow.map(item => {
       this.refLabels[item.x] = item.label;
     });
 
     this.yScale = d3Scale.scaleLinear()
-                    .domain([0, d3Array.max(this.activeData, d => d.y)])
+                    .domain([0, d3Array.max(this.biggestDatasetToShow, d => d.y)])
                     .range([this.state.size.innerHeight, 0])
                     .nice(); // Y axis should extend to nicely readable 0..100
 
     this._setWidth(props);
+
     if (props.isDetail) {
       window.addEventListener('resize', this.handleResize);
     }
@@ -113,15 +134,15 @@ class ChartContainer extends React.Component {
   }
 
   // Return an array with only the central 99% of elements included. Assumes
-  // allData is sorted.
-  _removeOutliers(allData) {
+  // data is sorted.
+  _removeOutliers(data) {
     // The indices of the first and last element to be included in the result
-    const indexFirst = Math.round(allData.length * 0.005) - 1;
-    const indexLast = Math.round(allData.length * 0.995) - 1;
+    const indexFirst = Math.round(data.length * 0.005) - 1;
+    const indexLast = Math.round(data.length * 0.995) - 1;
 
     // Add 1 to indexLast because the second paramater to Array.slice is not
     // inclusive
-    return allData.slice(indexFirst, indexLast + 1);
+    return data.slice(indexFirst, indexLast + 1);
   }
 
   _getXScale(props, innerWidth) {
@@ -129,7 +150,7 @@ class ChartContainer extends React.Component {
     let xScale;
     if (props.metric.type === 'category') {
       xScale = d3Scale.scaleLinear()
-                 .domain([1, d3Array.max(this.activeData, d => d.x)])
+                 .domain([1, d3Array.max(this.biggestDatasetToShow, d => d.x)])
                  .range([0, innerWidth]);
     } else {
       let scaleType;
@@ -147,7 +168,7 @@ class ChartContainer extends React.Component {
       }
 
       xScale = scaleType
-                 .domain(d3Array.extent(this.activeData, d => d.x))
+                 .domain(d3Array.extent(this.biggestDatasetToShow, d => d.x))
                  .range([0, innerWidth]);
     }
 
@@ -180,12 +201,12 @@ class ChartContainer extends React.Component {
 
           metricId={this.props.metricId}
           name={this.props.metric.metric}
-          data={this.activeData}
-          refLabels={this.refLabels}
+          populationData={this.populationData}
           metricType={this.props.metric.type}
-          showOutliers={this.props.showOutliers}
+          shouldShowOutliers={this.shouldShowOutliers}
           hoverString={this.props.metric.hoverString}
           tooltip={this.props.tooltip}
+          refLabels={this.refLabels}
 
           size={this.state.size}
           xScale={this.state.xScale}

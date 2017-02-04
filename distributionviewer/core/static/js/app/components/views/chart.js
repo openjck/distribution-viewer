@@ -7,6 +7,35 @@ import ChartHoverContainer from '../containers/chart-hover-container';
 import ChartFocus from './chart-focus';
 
 
+let populationNumber = 0;
+
+function renderPopulations(props, populationData) {
+  let rendering = '';
+
+  for (let populationName in populationData) {
+    if (populationData.hasOwnProperty(populationName)) {
+
+      const currentPopulation = populationData[populationName];
+      populationNumber += 1;
+
+      rendering += (
+        <g className={`population population-${populationNumber}`}>
+          <ChartLineContainer
+            popNumber={populationNumber}
+            metricId={props.metricId}
+            xScale={props.xScale}
+            yScale={props.yScale}
+            data={props.shouldShowOutliers ? currentPopulation.all : currentPopulation.excludingOutliers}
+          />
+          <ChartFocus />
+        </g>
+      );
+    }
+  }
+
+  return rendering;
+}
+
 export default function(props) {
   if (props.isFetching) {
     return (
@@ -15,6 +44,10 @@ export default function(props) {
       </div>
     );
   } else {
+    const pdOnlyAll = {'All': props.populationData['All']};
+    const pdExcludingAll = props.populationData;
+    delete pdExcludingAll['All'];
+
     return (
       <div className={`chart chart-${props.metricId}`}>
         <div className={props.tooltip ? 'tooltip-wrapper' : ''}>
@@ -38,13 +71,15 @@ export default function(props) {
               refLabels={props.refLabels}
               size={props.size.innerWidth}
             />
-            <ChartLineContainer
-              metricId={props.metricId}
-              xScale={props.xScale}
-              yScale={props.yScale}
-              data={props.data}
-            />
-            <ChartFocus />
+            <g className="populations">
+              {/*
+              In SVG, the elemenet that appears last in the markup has the
+              greatest "z-index". We want the "All" population to appear above
+              other populations when they overlap, so we need to render it last.
+              */}
+              {renderPopulations(props, pdExcludingAll)}
+              {renderPopulations(props, pdOnlyAll)}
+            </g>
             <ChartHoverContainer
               metricId={props.metricId}
               size={props.size}
@@ -53,7 +88,6 @@ export default function(props) {
               hoverString={props.hoverString}
               refLabels={props.refLabels}
               metricType={props.metricType}
-              data={props.data}
             />
           </g>
         </svg>
