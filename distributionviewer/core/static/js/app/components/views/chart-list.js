@@ -18,6 +18,7 @@ export default function(props) {
                 isDetail={false}
                 showOutliers={false}
                 tooltip={tooltip}
+                whitelistedPopulations={props.whitelistedPopulations}
               />
             </div>
           </Link>
