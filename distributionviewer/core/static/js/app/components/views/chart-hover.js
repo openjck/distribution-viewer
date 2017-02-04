@@ -23,6 +23,7 @@ export default class extends React.Component {
     let x0 = props.xScale.invert(mouse(this.refs.rect)[0]);
 
     for (let populationIndex = 0; populationIndex < props.populations.length; populationIndex++) {
+      const currentPopulation = props.populations[populationIndex];
       const currentData = props.populations[populationIndex].points;
 
       let i = this.bisector(currentData, x0, 1);
@@ -41,14 +42,12 @@ export default class extends React.Component {
 
       // Position the focus circle on chart line.
       this.focusElm.attr('transform', `translate(${props.xScale(d.x)}, ${props.yScale(d.y)})`);
-    }
 
-    // TODO: Temporary: Only show this when there is only one population
-    // Set formatted chart hover text.
-    if (props.populations.length === 1) {
-      select('.secondary-menu-content .chart-info').text(
-        this._getHoverString(props.metricType, d.x, d.y, proportion)
-      );
+      if (currentPopulation.population === 'All') {
+        select('.secondary-menu-content .chart-info').text(
+          this._getHoverString(props.metricType, d.x, d.y, proportion)
+        );
+      }
     }
   }
   _getFormattedVal(val) {
