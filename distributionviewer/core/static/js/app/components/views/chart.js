@@ -29,7 +29,7 @@ export default class extends React.Component {
               metricId={props.metricId}
               xScale={props.xScale}
               yScale={props.yScale}
-              data={props.shouldShowOutliers ? currentPopulation.all : currentPopulation.excludingOutliers}
+              data={currentPopulation[props.activeDataset]}
             />
             <ChartFocus />
           </g>
@@ -48,9 +48,14 @@ export default class extends React.Component {
         </div>
       );
     } else {
-      const pdOnlyAll = {'All': this.props.populationData['All']};
-      const pdExcludingAll = this.props.populationData;
-      delete pdExcludingAll['All'];
+      // ES6!
+      //
+      // This is equivalent the following:
+      // const all = this.props.populdationData['All'];
+      // const pdExcludingAll = this.props.populdationData[... everything else ...];
+      // const pdOnlyAll = { 'All': all };
+      const {'All': all, ...pdExcludingAll} = this.props.populationData;
+      const pdOnlyAll = { 'All': all }
 
       return (
         <div className={`chart chart-${this.props.metricId}`}>
@@ -89,6 +94,8 @@ export default class extends React.Component {
                 size={this.props.size}
                 xScale={this.props.xScale}
                 yScale={this.props.yScale}
+                populations={this.props.populationData}
+                activeDataset={this.props.activeDataset}
                 hoverString={this.props.hoverString}
                 refLabels={this.props.refLabels}
                 metricType={this.props.metricType}

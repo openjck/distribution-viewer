@@ -92,16 +92,14 @@ class ChartContainer extends React.Component {
       }
     }
 
+    this.activeDataset = this.shouldShowOutliers ? 'all' : 'excludingOutliers';
+
     // Make a copy of the biggest dataset we can show right now. That is, the
     // dataset from the biggest population after it is optionally trimmed of
     // outliers.
     //
     // We'll need this when setting the scales.
-    if (this.shouldShowOutliers) {
-      this.biggestDatasetToShow = this.populationData[biggestPopulation.population].all;
-    } else {
-      this.biggestDatasetToShow = this.populationData[biggestPopulation.population].excludingOutliers;
-    }
+    this.biggestDatasetToShow = this.populationData[biggestPopulation.population][this.activeDataset];
 
     this.refLabels = [];
     this.biggestDatasetToShow.map(item => {
@@ -208,7 +206,7 @@ class ChartContainer extends React.Component {
           name={this.props.metric.metric}
           populationData={this.populationData}
           metricType={this.props.metric.type}
-          shouldShowOutliers={this.shouldShowOutliers}
+          activeDataset={this.activeDataset}
           hoverString={this.props.metric.hoverString}
           tooltip={this.props.tooltip}
           refLabels={this.refLabels}

@@ -19,7 +19,7 @@ export default function(props) {
       </header>
       <div className="secondary-menu">
         <div className="secondary-menu-content">
-          <p className="chart-info" />
+          <div className="chart-info" />
         </div>
         <Link className="configure-link"
               to={'/configure/'
