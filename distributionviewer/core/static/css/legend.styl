@@ -1,0 +1,25 @@
+@import 'lib';
+
+.population-info {
+  margin-bottom: $med-padding;
+
+  /* Vertically-center lines and names */
+  display: flex;
+  align-items: center;
+
+  .example-line {
+    margin-right: $min-padding;
+  }
+}
+
+#legend {
+  display: inline-block;
+
+  for $i in (1..$max-populations) {
+    .population-{$i} {
+      line {
+        stroke: lookup('$pop-' + $i + '-color')
+      }
+    }
+  }
+}
