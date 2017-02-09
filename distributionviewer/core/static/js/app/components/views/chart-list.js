@@ -14,7 +14,7 @@ export default function(props) {
 
     const tooltip = <DescriptionContainer rawDescription={metricMeta.description} asTooltip={true} />;
     chartLinks.push(
-      <Link key={metricMeta.id} className="chart-link" to={`/chart/${metricMeta.id}/`}>
+      <Link key={metricMeta.id} className="chart-link" to={`/chart/${metricMeta.id}/?pop=${props.whitelistedPopulations.join(',')}`}>
         <div>
           <ChartContainer
             metricId={metricMeta.id}

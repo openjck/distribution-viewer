@@ -51,7 +51,7 @@ class ChartContainer extends React.Component {
     // If the outliers setting changed, update the active data accordingly.
     // Check against true explicitly because props are sometimes undefined.
     if (outliersSettingChanged) {
-      this.shouldShowOutliers = props.metric.type === 'numeric' && showOutliers === true;
+      this.shouldShowOutliers = this.props.metric.type === 'numeric' && showOutliers === true;
     }
 
     // If either the outliers setting or the selected scale has changed, the
