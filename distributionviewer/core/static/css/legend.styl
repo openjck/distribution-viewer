@@ -1,20 +1,33 @@
 @import 'lib';
 
-.population-info {
-  margin-bottom: $med-padding;
-
-  /* Vertically-center lines and names */
-  display: flex;
-  align-items: center;
-
-  .example-line {
-    margin-right: $min-padding;
-  }
-}
+$li-margin-bottom = $med-padding;
 
 #legend {
-  display: inline-block;
+  margin: $lrg-padding 0;
 
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    /* Compensate for the margin-bottom of the last row of li elements */
+    margin-bottom: -($li-margin-bottom);
+  }
+
+  li {
+    float: left;
+    padding: 0 $med-padding;
+    margin-bottom: $li-margin-bottom;
+
+    /* Vertically-center lines and names */
+    display: flex;
+    align-items: center;
+  }
+
+  /* Color the lines */
   for $i in (1..$max-populations) {
     .population-{$i} {
       line {
@@ -22,4 +35,8 @@
       }
     }
   }
+}
+
+.example-line {
+  margin-right: $min-padding;
 }

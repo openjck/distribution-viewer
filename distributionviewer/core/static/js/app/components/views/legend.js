@@ -19,18 +19,20 @@ export default function(props) {
 
   return (
     <section id="legend">
-      {popAllLast.map((population, index) => {
-        return (
-          <div key={index} className="population-info">
-            <svg className={`example-line population-${index + 1}`} width="50" height="5">
-              <line x1="0" y1="5" x2="50" y2="5" strokeWidth="5" />
-            </svg>
-            <span className="name">
-              {population.population}
-            </span>
-          </div>
-        );
-      })}
+      <ul>
+        {popAllLast.map((population, index) => {
+          return (
+            <li key={index}>
+              <svg className={`example-line population-${index + 1}`} width="50" height="5">
+                <line x1="0" y1="5" x2="50" y2="5" strokeWidth="5" />
+              </svg>
+              <span className="name">
+                {population.population}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
