@@ -63,7 +63,6 @@ class ChartContainer extends React.Component {
   }
 
   _initialize(props) {
-    const outlierThreshold = 100;
     this.shouldShowOutliers = props.metric.type === 'numeric' && props.showOutliers;
 
     this.populationData = {};

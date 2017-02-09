@@ -1,5 +1,5 @@
 import React from 'react';
-import { Router, Route, Redirect, browserHistory } from 'react-router';
+import { Router, Route, browserHistory } from 'react-router';
 
 // Layouts
 import MainLayout from './components/layouts/main-layout';
