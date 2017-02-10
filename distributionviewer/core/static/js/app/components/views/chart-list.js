@@ -9,6 +9,7 @@ import LegendContainer from '../containers/legend-container';
 export default function(props) {
   let chartLinks = [];
   let firstMetricId;
+
   props.metadata.map(metricMeta => {
     if (firstMetricId === undefined) firstMetricId = metricMeta.id;
 
@@ -29,7 +30,7 @@ export default function(props) {
   });
 
   let maybeLegendContainer;
-  if (props.whitelistedPopulations.length > 1) {
+  if (firstMetricId && props.whitelistedPopulations.length > 1) {
     maybeLegendContainer = (
       <LegendContainer
         // In chart listings, all charts show the same populations, so it
