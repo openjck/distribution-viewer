@@ -14,6 +14,8 @@ class ChartContainer extends React.Component {
 
     this.margin = {top: 20, right: 20, bottom: 30, left: 40};
     this.height = props.isDetail ? 600 : 250;
+    this.allDatasetName = 'all';
+    this.excludingOutliersDatasetName = 'excludingOutliers';
 
     this.state = {size: {
       height: this.height,
@@ -48,10 +50,14 @@ class ChartContainer extends React.Component {
     const outliersSettingChanged = showOutliers !== prevProps.showOutliers;
     const selectedScaleChanged = this.props.selectedScale !== prevProps.selectedScale;
 
-    // If the outliers setting changed, update the active data accordingly.
+    // If the outliers setting changed, update the active dataset accordingly.
     // Check against true explicitly because props are sometimes undefined.
     if (outliersSettingChanged) {
-      this.shouldShowOutliers = this.props.metric.type === 'numeric' && showOutliers === true;
+      if (showOutliers) {
+        this.activeDataset = this.allDatasetName;
+      } else if (showOutliers === false) {
+        this.activeDataset = this.excludingOutliersDatasetName;
+      }
     }
 
     // If either the outliers setting or the selected scale has changed, the
@@ -63,8 +69,6 @@ class ChartContainer extends React.Component {
   }
 
   _initialize(props) {
-    this.shouldShowOutliers = props.metric.type === 'numeric' && props.showOutliers;
-
     this.populationData = {};
     let biggestPopulation;
     for (let i = 0; i < props.metric.populations.length; i++) {
@@ -72,7 +76,9 @@ class ChartContainer extends React.Component {
       const fmtData = this._getFormattedData(population.points);
 
       let fmtDataExcludingOutliers;
-      if (this.shouldShowOutliers === false) {
+
+      // Check against false explicitly because props are sometimes undefined
+      if (props.showOutliers === false) {
         fmtDataExcludingOutliers = this._removeOutliers(fmtData);
       }
 
@@ -85,13 +91,13 @@ class ChartContainer extends React.Component {
 
       // population.population = the name of this population
       this.populationData[population.population] = {};
-      this.populationData[population.population]['all'] = fmtData;
+      this.populationData[population.population][this.allDatasetName] = fmtData;
       if (fmtDataExcludingOutliers) {
-        this.populationData[population.population]['excludingOutliers'] = fmtDataExcludingOutliers;
+        this.populationData[population.population][this.excludingOutliersDatasetName] = fmtDataExcludingOutliers;
       }
     }
 
-    this.activeDataset = this.shouldShowOutliers ? 'all' : 'excludingOutliers';
+    this.activeDataset = props.showOutliers ? this.allDatasetName : this.excludingOutliersDatasetName;
 
     // Make a copy of the biggest dataset we can show right now. That is, the
     // dataset from the biggest population after it is optionally trimmed of
