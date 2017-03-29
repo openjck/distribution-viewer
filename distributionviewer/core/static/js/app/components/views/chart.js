@@ -84,6 +84,7 @@ export default class extends React.Component {
                 axisType="x"
                 refLabels={this.props.refLabels}
                 size={this.props.size.innerHeight}
+                axisGap={this.props.axisGap}
               />
               <ChartAxisContainer
                 metricId={this.props.metricId}
@@ -91,27 +92,30 @@ export default class extends React.Component {
                 axisType="y"
                 refLabels={this.props.refLabels}
                 size={this.props.size.innerWidth}
+                axisGap={this.props.axisGap}
               />
-              <g className="populations">
-                {/*
-                In SVG, the elemenet that appears last in the markup has the
-                greatest "z-index". We want the "All" population to appear above
-                other populations when they overlap, so we need to render it last.
-                */}
-                {this.renderPopulations(this.props, pdExcludingAll)}
-                {pdOnlyAll && this.renderPopulations(this.props, pdOnlyAll)}
+              <g transform={`translate(${this.props.axisGap}, -${this.props.axisGap})`}>
+                <g className="populations">
+                  {/*
+                  In SVG, the elemenet that appears last in the markup has the
+                  greatest "z-index". We want the "All" population to appear above
+                  other populations when they overlap, so we need to render it last.
+                  */}
+                  {this.renderPopulations(this.props, pdExcludingAll)}
+                  {pdOnlyAll && this.renderPopulations(this.props, pdOnlyAll)}
+                </g>
+                <ChartHoverContainer
+                  metricId={this.props.metricId}
+                  size={this.props.size}
+                  xScale={this.props.xScale}
+                  yScale={this.props.yScale}
+                  populations={this.props.populationData}
+                  activeDatasetName={this.props.activeDatasetName}
+                  hoverString={this.props.hoverString}
+                  refLabels={this.props.refLabels}
+                  metricType={this.props.metricType}
+                />
               </g>
-              <ChartHoverContainer
-                metricId={this.props.metricId}
-                size={this.props.size}
-                xScale={this.props.xScale}
-                yScale={this.props.yScale}
-                populations={this.props.populationData}
-                activeDatasetName={this.props.activeDatasetName}
-                hoverString={this.props.hoverString}
-                refLabels={this.props.refLabels}
-                metricType={this.props.metricType}
-              />
             </g>
           </svg>
         </div>

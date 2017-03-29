@@ -13,13 +13,14 @@ class ChartContainer extends React.Component {
     super(props);
 
     this.margin = {top: 20, right: 20, bottom: 30, left: 40};
+    this.axisGap = 10; // Gap between axes and chart area
     this.height = props.isDetail ? 600 : 250;
     this.allDatasetName = 'all';
     this.excludingOutliersDatasetName = 'excludingOutliers';
 
     this.state = {size: {
       height: this.height,
-      innerHeight: this.height - this.margin.top - this.margin.bottom,
+      innerHeight: this.height - this.axisGap - this.margin.top - this.margin.bottom,
       transform: `translate(${this.margin.left}, ${this.margin.top})`,
     }};
 
@@ -206,7 +207,7 @@ class ChartContainer extends React.Component {
     }
 
     // innerWidth = size of the contents of the SVG
-    const innerWidth = width - this.margin.left - this.margin.right;
+    const innerWidth = width - this.axisGap - this.margin.left - this.margin.right;
     const xScale = this._getXScale(props, innerWidth);
     const sizeIncludingWidth = Object.assign({}, this.state.size, {width, innerWidth});
     this.setState({xScale, size: sizeIncludingWidth});
@@ -239,6 +240,7 @@ class ChartContainer extends React.Component {
           tooltip={this.props.tooltip}
 
           size={this.state.size}
+          axisGap={this.axisGap}
           xScale={this.state.xScale}
           yScale={this.yScale}
         />
